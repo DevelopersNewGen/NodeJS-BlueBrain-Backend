@@ -1,0 +1,44 @@
+{
+  "name": "nodejs-bluebrain-backend",
+  "version": "1.0.0",
+  "description": "Plataforma de tutorias",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DevelopersNewGen/NodeJS-BlueBrain-Backend.git"
+  },
+  "homepage": "https://github.com/DevelopersNewGen/NodeJS-DBB-Backend#readme",
+  "dependencies": {
+    "argon2": "^0.41.1",
+    "axios": "^1.9.0",
+    "cloudinary": "^1.21.0",
+    "cors": "^2.8.5",
+    "date-fns": "^4.1.0",
+    "dotenv": "^16.5.0",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "express-session": "^1.18.1",
+    "express-validator": "^7.2.1",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.5",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "multer-storage-cloudinary": "^4.0.0",
+    "node-cron": "^4.0.7",
+    "passport": "^0.7.0",
+    "passport-azure-ad": "^4.3.5",
+    "path": "^0.12.7",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "uuid": "^11.1.0"
+  },
+  "author": "Developers",
+  "license": "MIT"
+}

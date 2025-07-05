@@ -19,6 +19,8 @@ const subjectSchema = new Schema({
     },
     grade: {
         type: String,
+        enum: ['4to', '5to', '6to'],
+        required: [true, "Subject grade is required"]
     },
     description: {
         type: String,
@@ -28,6 +30,15 @@ const subjectSchema = new Schema({
         type: Boolean,
         default: true,
     },
-})
+},
+{
+    timestamps: true,
+});
+
+suibjectSchema.methods.toJSON = function () {
+    const { _id, __v, ...subject } = this.toObject();
+    subject.sid = _id; 
+    return subject;
+}
 
 export default model('Subject', subjectSchema)

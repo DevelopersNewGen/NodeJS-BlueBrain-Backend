@@ -9,9 +9,9 @@ export const createDefaultAdmin = async () => {
         }
 
         const admin = new User({
-            azureId: 'admin-azure-id',
-            name: 'Admin',
-            email: 'admin@bluebrain.com',
+            azureId: 'acd9b024-47c2-489e-a0db-994c6fb1419c',
+            name: 'jfigueroa-2023015',
+            email: 'jfigueroa-2023015@kinal.edu.gt',
             role: 'ADMIN_ROLE',
             rating: 5
         });

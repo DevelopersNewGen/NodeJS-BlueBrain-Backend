@@ -42,9 +42,9 @@ const userSchema = new Schema({
 });
 
 userSchema.methods.toJSON = function () {
-    const { _id, __v, ...user } = this.toObject();
-    user.uid = _id; 
-    return user;
+    const { _id, ...usuario } = this.toObject();
+    usuario.uid = _id; 
+    return usuario;
 };
 
 export default model("User", userSchema);

@@ -11,7 +11,7 @@ export const validateGetSubjects = [
 
 export const validateGetSubjectById = [
     validateJWT,
-    param('id').isMongoId().withMessage('Invalid subject id'),
+    param('sid').isMongoId().withMessage('Invalid subject id'),
     validateField,
     handleErrors
 ];
@@ -30,7 +30,7 @@ export const validateCreateSubject = [
 export const validateUpdateSubject = [
     validateJWT,
     hasRoles("ADMIN_ROLE", "TEACHER_ROLE"),
-    param('id').isMongoId().withMessage('Invalid subject id'),
+    param('sid').isMongoId().withMessage('Invalid subject id'),
     body('name').optional().notEmpty().withMessage('Subject name is required'),
     body('code').optional().notEmpty().withMessage('Subject code is required'),
     body('grade').optional().notEmpty().withMessage('Subject grade is required'),
@@ -42,7 +42,7 @@ export const validateUpdateSubject = [
 export const validateDeleteSubject = [
     validateJWT,
     hasRoles("ADMIN_ROLE", "TEACHER_ROLE"),
-    param('id').isMongoId().withMessage('Invalid subject id'),
+    param('sid').isMongoId().withMessage('Invalid subject id'),
     validateField,
     handleErrors
 ];
@@ -50,7 +50,7 @@ export const validateDeleteSubject = [
 export const validateAddTeacherToSubject = [
     validateJWT,
     hasRoles("ADMIN_ROLE", "TEACHER_ROLE"),
-    param('id').isMongoId().withMessage('Invalid subject id'),
+    param('sid').isMongoId().withMessage('Invalid subject id'),
     body('teacherId').isMongoId().withMessage('Invalid teacher id'),
     validateField,
     handleErrors

@@ -1,6 +1,10 @@
 import { Schema, model } from "mongoose";
 
 const subjectSchema = new Schema({
+    img: {
+        type: String,
+        default: "",
+    },
     teachers: [
         {
             type: Schema.Types.ObjectId,
@@ -35,7 +39,7 @@ const subjectSchema = new Schema({
     timestamps: true,
 });
 
-suibjectSchema.methods.toJSON = function () {
+subjectSchema.methods.toJSON = function () {
     const { _id, __v, ...subject } = this.toObject();
     subject.sid = _id; 
     return subject;

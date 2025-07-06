@@ -7,6 +7,8 @@ import cors from "cors";
 import apiLimiter from "../src/middlewares/rate-limit-validator.js";
 import authRoutes from "../src/auth/auth.routes.js";
 import subjectRoutes from "../src/subject/subject.routes.js";
+import userRoutes from "../src/user/user.routes.js";
+import reportRoutes from "../src/report/report.routes.js";
 import {createDefaultAdmin} from "./default-data.js";
 
 const middlewares = (app) => {
@@ -21,6 +23,8 @@ const middlewares = (app) => {
 const routes = (app) => {
   app.use("/BlueBrain/v1/auth", authRoutes);
   app.use("/BlueBrain/v1/subjects", subjectRoutes);
+  app.use("/BlueBrain/v1/users", userRoutes);
+  app.use("/BlueBrain/v1/reports", reportRoutes);
 };
 
 const conectarDB = async () => {

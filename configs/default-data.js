@@ -1,4 +1,5 @@
 import User from '../src/user/user.model.js';
+import Subject from '../src/subject/subject.model.js';
 
 export const createDefaultAdmin = async () => {
     try {
@@ -22,3 +23,28 @@ export const createDefaultAdmin = async () => {
             console.error('Error creando admin por defecto:', error);
     }
 };
+
+export const createDefaultSubject = async () => {
+    try {
+        const subjectExists = await Subject.findOne({ name: 'Matemática' });
+        if (subjectExists) {
+            console.log('Materia por defecto ya existe.');
+            return;
+        }
+
+        const subject = new Subject({
+            name: 'Matemática',
+            description: 'Matemática 1',
+            code: 'PE4MT',
+            grade: '4to',
+            img: 'https://res.cloudinary.com/dibe6yrzf/image/upload/v1751771469/mate_srkkdc.png',
+            teachers: [],
+            status: true
+        });
+
+        await subject.save();
+        console.log('Materia por defecto creada.');
+    } catch (error) {
+        console.error('Error creando materia por defecto:', error);
+    }
+}

@@ -1,0 +1,23 @@
+[{
+  "_id": {
+    "$oid": "68695604f841fa6cd28e3987"
+  },
+  "img": "https://res.cloudinary.com/dibe6yrzf/image/upload/v1751771469/mate_srkkdc.png",
+  "teachers": [
+    {
+      "$oid": "68689507c9a7e1a8b1eba8ed"
+    }
+  ],
+  "name": "Matemática",
+  "code": "PE4MT",
+  "grade": "4to",
+  "description": "Matemática 1'",
+  "status": true,
+  "createdAt": {
+    "$date": "2025-07-05T16:42:44.447Z"
+  },
+  "updatedAt": {
+    "$date": "2025-07-05T17:12:57.163Z"
+  },
+  "__v": 3
+}]

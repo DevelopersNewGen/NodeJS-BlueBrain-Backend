@@ -6,7 +6,7 @@
   "profilePicture": "https://res.cloudinary.com/dibe6yrzf/image/upload/v1747668225/perfil-de-usuario_cxmmxq.png",
   "name": "atum-2023017",
   "email": "atum-2023017@kinal.edu.gt",
-  "role": "STUDENT_ROLE",
+  "role": "TEACHER_ROLE",
   "subjects": [],
   "rating": 0,
   "createdAt": {
@@ -22,7 +22,7 @@
     "$oid": "6868962ac9a7e1a8b1eba8f1"
   },
   "azureId": "db4c7c7a-31a9-4033-9b90-e97c56229d49",
-  "profilePicture": "https://res.cloudinary.com/dibe6yrzf/image/upload/v1747668225/perfil-de-usuario_cxmmxq.png",
+  "profilePicture": "https://res.cloudinary.com/dibe6yrzf/image/upload/v1751750418/user/profilePicture/yo-f1cb942a.jpg",
   "name": "lxocoy-2023020",
   "email": "lxocoy-2023020@kinal.edu.gt",
   "role": "STUDENT_ROLE",
@@ -32,7 +32,7 @@
     "$date": "2025-07-05T03:04:10.034Z"
   },
   "updatedAt": {
-    "$date": "2025-07-05T03:04:10.034Z"
+    "$date": "2025-07-05T21:20:19.006Z"
   },
   "__v": 0
 },
@@ -70,7 +70,7 @@
     "$date": "2025-07-05T03:12:33.877Z"
   },
   "updatedAt": {
-    "$date": "2025-07-05T03:12:33.877Z"
+    "$date": "2025-07-05T21:31:24.328Z"
   },
   "__v": 0
 }]

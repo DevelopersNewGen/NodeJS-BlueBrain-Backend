@@ -65,8 +65,8 @@ const createMulterUpload = (baseFolder, useMaterialName = false, maxFileSize = 1
     });
 };
 
-export const uploadProductImg = createMulterUpload("products", true);
-
+export const uploadSubjectImg = createMulterUpload("subject", true);
+export const uploadUserImg = createMulterUpload("user", true);
 
 
 

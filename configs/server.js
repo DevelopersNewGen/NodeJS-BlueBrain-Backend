@@ -5,7 +5,11 @@ import helmet from "helmet";
 import morgan from "morgan";
 import cors from "cors";
 import apiLimiter from "../src/middlewares/rate-limit-validator.js";
-
+import authRoutes from "../src/auth/auth.routes.js";
+import subjectRoutes from "../src/subject/subject.routes.js";
+import userRoutes from "../src/user/user.routes.js";
+import reportRoutes from "../src/report/report.routes.js";
+import {createDefaultAdmin} from "./default-data.js";
 
 const middlewares = (app) => {
   app.use(express.urlencoded({ extended: false }));
@@ -17,7 +21,10 @@ const middlewares = (app) => {
 };
 
 const routes = (app) => {
-
+  app.use("/BlueBrain/v1/auth", authRoutes);
+  app.use("/BlueBrain/v1/subjects", subjectRoutes);
+  app.use("/BlueBrain/v1/users", userRoutes);
+  app.use("/BlueBrain/v1/reports", reportRoutes);
 };
 
 const conectarDB = async () => {
@@ -34,6 +41,7 @@ export const initServer = () => {
   try {
     middlewares(app);
     conectarDB();
+    createDefaultAdmin();
     routes(app);
     const port = process.env.PORT;
     app.listen(port, () => {

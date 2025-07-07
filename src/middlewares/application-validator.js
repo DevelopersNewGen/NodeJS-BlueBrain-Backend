@@ -17,13 +17,13 @@ export const peticionToBeTutorValidator = [
 
 export const getAllApplicationsValidator = [
     validateJWT,
-    hasRoles("ADMIN_ROLE", "TEACHER_ROLE", "STUDENT_ROLE"),
+    hasRoles("ADMIN_ROLE", "TEACHER_ROLE"),
     handleErrors
 ];
 
 export const approveApplicationValidator = [
     validateJWT,
-    hasRoles("ADMIN_ROLE", "TEACHER_ROLE", "STUDENT_ROLE"),
+    hasRoles("ADMIN_ROLE", "TEACHER_ROLE"),
     param('aid').isMongoId().withMessage('Invalid application id'),
     body('status').isIn(['approved', 'rejected']).withMessage('Status must be either approved or rejected'),
     body('responseMessage').optional().isString().withMessage('Response message must be a string'),

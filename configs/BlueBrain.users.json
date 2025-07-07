@@ -6,7 +6,7 @@
   "profilePicture": "https://res.cloudinary.com/dibe6yrzf/image/upload/v1747668225/perfil-de-usuario_cxmmxq.png",
   "name": "atum-2023017",
   "email": "atum-2023017@kinal.edu.gt",
-  "role": "STUDENT_ROLE",
+  "role": "TEACHER_ROLE",
   "subjects": [],
   "rating": 0,
   "createdAt": {
@@ -23,6 +23,7 @@
   },
   "azureId": "db4c7c7a-31a9-4033-9b90-e97c56229d49",
   "profilePicture": "https://res.cloudinary.com/dibe6yrzf/image/upload/v1747668225/perfil-de-usuario_cxmmxq.png",
+  "profilePicture": "https://res.cloudinary.com/dibe6yrzf/image/upload/v1751750418/user/profilePicture/yo-f1cb942a.jpg",
   "name": "lxocoy-2023020",
   "email": "lxocoy-2023020@kinal.edu.gt",
   "role": "STUDENT_ROLE",

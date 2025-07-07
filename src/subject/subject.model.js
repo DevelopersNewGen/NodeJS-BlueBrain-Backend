@@ -3,7 +3,7 @@ import { Schema, model } from "mongoose";
 const subjectSchema = new Schema({
     img: {
         type: String,
-        default: "",
+        default: "https://res.cloudinary.com/dibe6yrzf/image/upload/v1751771469/mate_srkkdc.png",
     },
     teachers: [
         {

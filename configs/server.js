@@ -10,7 +10,7 @@ import subjectRoutes from "../src/subject/subject.routes.js";
 import userRoutes from "../src/user/user.routes.js";
 import reportRoutes from "../src/report/report.routes.js";
 import applicationRoutes from "../src/application/application.routes.js";
-import {createDefaultAdmin} from "./default-data.js";
+import {createDefaultAdmin, createDefaultSubject} from "./default-data.js";
 
 const middlewares = (app) => {
   app.use(express.urlencoded({ extended: false }));
@@ -44,6 +44,7 @@ export const initServer = () => {
     middlewares(app);
     conectarDB();
     createDefaultAdmin();
+    createDefaultSubject();
     routes(app);
     const port = process.env.PORT;
     app.listen(port, () => {

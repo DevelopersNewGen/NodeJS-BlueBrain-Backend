@@ -1,4 +1,5 @@
 import User from '../src/user/user.model.js';
+
 import Subject from '../src/subject/subject.model.js';
 
 export const createDefaultAdmin = async () => {

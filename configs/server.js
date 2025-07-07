@@ -9,6 +9,7 @@ import authRoutes from "../src/auth/auth.routes.js";
 import subjectRoutes from "../src/subject/subject.routes.js";
 import userRoutes from "../src/user/user.routes.js";
 import reportRoutes from "../src/report/report.routes.js";
+import applicationRoutes from "../src/application/application.routes.js";
 import {createDefaultAdmin, createDefaultSubject} from "./default-data.js";
 
 const middlewares = (app) => {
@@ -25,6 +26,7 @@ const routes = (app) => {
   app.use("/BlueBrain/v1/subjects", subjectRoutes);
   app.use("/BlueBrain/v1/users", userRoutes);
   app.use("/BlueBrain/v1/reports", reportRoutes);
+  app.use("/BlueBrain/v1/applications", applicationRoutes);
 };
 
 const conectarDB = async () => {

@@ -1,124 +1,201 @@
-import { uploadPdfToOneDrive } from "../helpers/upload-pdf.js";
 import application from "./application.model.js";
 import user from "../user/user.model.js";
-import fs from "fs";
+import Subject from "../subject/subject.model.js";
 
 export const requestToBeTutor = async (req, res) => {
-    try {
-        const { subject, description } = req.body;
-        const { usuario } = req;
+	try {
+		let img = req.file;
 
-        if (!subject || !description || !req.file) {
-            return res.status(400).json({
-                success: false,
-                msg: "All fields are required"
-            });
-        }
+		const { subject, description } = req.body;
+		const { usuario } = req;
 
-        const accessToken = usuario.graphToken; 
-        const localFilePath = req.file.path;
-        const oneDriveFileName = req.file.originalname;
+		const evidenceUrl = img ? img.path : null;
 
-        let evidenceUrl;
-        try {
-            const uploadResult = await uploadPdfToOneDrive(localFilePath, oneDriveFileName, accessToken);
-            evidenceUrl = uploadResult.webUrl; 
+		if (!subject || !description || !req.file) {
+			return res.status(400).json({
+				success: false,
+				msg: "All fields are required"
+			});
+		}
+		
+		const applicationTutor = new application({
+			applicantId: usuario._id,
+			subject,
+			description,
+			evidence: evidenceUrl,
+			status: 'pending'
+		});
 
-            fs.unlink(localFilePath, (err) => {
-                if (err) console.error("Error deleting temp file:", err);
-            });
-        } catch (err) {
-            return res.status(500).json({
-                success: false,
-                msg: "Error uploading evidence to OneDrive",
-                error: err.message
-            });
-        }
+		await applicationTutor.save();
 
-        const applicationTutor = new application({
-            applicantId: usuario._id,
-            subject,
-            description,
-            evidence: evidenceUrl,
-            status: 'pending'
-        });
-
-        await applicationTutor.save();
-
-        res.status(201).json({
-            success: true,
-            msg: "Application submitted successfully",
-            applicationTutor
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            msg: "An error occurred while submitting the application",
-            error: error.message
-        });
-    }
+		res.status(201).json({
+			success: true,
+			msg: "Application submitted successfully",
+			applicationTutor
+		});
+	} catch (error) {
+		res.status(500).json({
+			success: false,
+			msg: "An error occurred while submitting the application",
+			error: error.message
+		});
+	}
 }
 
 export const getAllApplications = async (req, res) => {
-    try {
-        const applications = await application.find()
-        .populate('applicantId', 'name email')   
-        .populate('subject', 'grade description')
-        .sort({ requestHour: -1 });
+  try {
+		const applications = await application.find()
+			.populate('applicantId', 'name email')   
+			.populate('subject', 'grade description')
+			.sort({ requestHour: -1 });
 
-    return res.status(200).json({
-        success: true,
-        applications
-    });
-  } catch (error) {
-    return res.status(500).json({
-        success: false,
-        msg: 'Error al obtener las solicitudes',
-        error: error.message
-    });
-  }
+		return res.status(200).json({
+			success: true,
+			applications
+		});
+	} catch (error) {
+		return res.status(500).json({
+			success: false,
+			msg: 'Error al obtener las solicitudes',
+			error: error.message
+		});
+	}
 };
 
+export const getApplicationsByUser = async (req, res) => {
+	try {
+		const { uid } = req.params;
+		const applications = await application.find({ applicantId: uid })
+			.populate('applicantId', 'name email')
+			.populate('subject', 'grade description')
+			.sort({ requestHour: -1 });
+
+		if (applications.length === 0) {
+			return res.status(404).json({
+				success: false,
+				msg: 'No applications found for this user'
+			});
+		}
+
+		return res.status(200).json({
+			success: true,
+			applications
+		});
+	} catch (error) {
+		return res.status(500).json({
+			success: false,
+			msg: 'Error retrieving applications for user',
+			error: error.message
+		});
+	}
+}
+
+export const getApplicationsBySubject = async (req, res) => {
+	try {
+		const { sid } = req.params;
+		const applications = await application.find({ subject: sid })
+			.populate('applicantId', 'name email')
+			.populate('subject', 'grade description')
+			.sort({ requestHour: -1 });
+
+		if (applications.length === 0) {
+			return res.status(404).json({
+				success: false,
+				msg: 'No applications found for this subject'
+			});
+		}
+
+		return res.status(200).json({
+			success: true,
+			applications
+		});
+	} catch (error) {
+		return res.status(500).json({
+			success: false,
+			msg: 'Error retrieving applications for subject',
+			error: error.message
+		});
+	}
+}
+
+
+export const getApplicationById = async (req, res) => {
+	try {
+		const { aid } = req.params;
+		const app = await application.findById(aid)
+			.populate('applicantId', 'name email')
+			.populate('subject', 'grade description teachers');
+		
+		if (!app) {
+			return res.status(404).json({
+				success: false,
+				msg: 'Application not found'
+			});
+		}
+		
+		return res.status(200).json({
+			success: true,
+			application: app
+		});
+	} catch (error) {
+		return res.status(500).json({
+			success: false,
+			msg: 'Error retrieving application',
+			error: error.message
+		});
+	}
+}
+
 export const updateApplicationStatus = async (req, res) => {
-  try {
-    const { aid } = req.params;
-    const { status, responseMessage } = req.body;
+	try {
+		const { aid } = req.params;
+		const { status, responseMessage } = req.body;
+		const usuario = req.usuario; 
 
-    if (!['approved', 'rejected'].includes(status)) {
-      return res.status(400).json({
+		if (!['approved', 'rejected'].includes(status)) {
+			return res.status(400).json({
+				success: false,
+				msg: 'Estado inválido. Usa "approved" o "rejected".'
+			});
+		}
+    const app = await application.findById(aid).populate('subject', 'teachers');
+
+    console.log('Application found:', app);
+
+    if(!app.subject.teachers.includes(usuario._id)) {
+      return res.status(403).json({
         success: false,
-        msg: 'Estado inválido. Usa "approved" o "rejected".'
+        msg: 'No tienes permiso para actualizar esta solicitud'
       });
     }
 
-    const updatedApplication = await application.findByIdAndUpdate(
-      aid, { status, responseMessage: responseMessage || '' }, { new: true }
-    );
-    if (!application) {
-      return res.status(404).json({
-        success: false,
-        msg: 'Application no encontrada'
-      });
-    }
+		const updatedApplication = await application.findByIdAndUpdate(
+			aid, 
+			{ status, responseMessage: responseMessage || '' }, 
+			{ new: true }
+		);
 
-    if (status === 'approved') {
-      await user.findByIdAndUpdate(
-        application.applicantId,
-        { $addToSet: { subjects: application.subject } }
-      );
-    }
+		if (status === 'approved') {
+			await user.findByIdAndUpdate(
+				updatedApplication.applicantId,
+				{ $addToSet: { subjects: updatedApplication.subject }, role: "TUTOR_ROLE" }
+			);
+      await Subject.findByIdAndUpdate( app.subject._id, 
+        { $addToSet: { tutors: updatedApplication.applicantId } },
+      { new: true });
+		}
 
-    return res.status(200).json({
-      success: true,
-      msg: `Application ${status === 'approved' ? 'aprobada' : 'rechazada'} correctamente`,
-      updatedApplication
-    });
+		return res.status(200).json({
+			success: true,
+			msg: `Application ${status === 'approved' ? 'aprobada' : 'rechazada'} correctamente`,
+			updatedApplication
+		});
 
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      msg: 'Error interno al procesar la solicitud',
-      error: error.message
-    });
-  }
+	} catch (error) {
+		return res.status(500).json({
+			success: false,
+			msg: 'Error interno al procesar la solicitud',
+			error: error.message
+		});
+	}
 };

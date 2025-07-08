@@ -11,6 +11,12 @@ const subjectSchema = new Schema({
             ref: 'User' 
         }
     ],
+    tutors: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'User' 
+        }
+    ],
     name: {
         type: String,
         required: [true, "Subject name is required"],

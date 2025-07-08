@@ -66,7 +66,7 @@ const createMulterUpload = (baseFolder, categoryFolder, useMaterialName = false,
 
 export const uploadSubjectImg = createMulterUpload("subject", "img", true);
 export const uploadUserImg = createMulterUpload("user", "profilePicture", true);
-export const uploadEvidence = createMulterUpload("evidence", "pdf", false, 20 * 1024 * 1024);
+export const uploadEvidence = createMulterUpload("evidence", "img", false, 20 * 1024 * 1024);
 
 
 

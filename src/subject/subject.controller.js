@@ -128,10 +128,8 @@ export const addTeacherToSubject = async (req, res) => {
         }
 
         if(teacherExists.role !== 'TEACHER_ROLE') {
-            return res.status(400).json({
-                success: false, 
-                message: 'User is not a teacher' 
-            });
+            teacherExists.role = 'TEACHER_ROLE';
+            await teacherExists.save();
         }
 
         if (!subject) {
@@ -191,6 +189,43 @@ export const removeTeacherFromSubject = async (req, res) => {
         return res.status(500).json({ 
             success: false, 
             message: 'Error removing teacher from subject' 
+        });
+    }
+}
+
+export const removeTutorFromSubject = async (req, res) => {
+    const { sid } = req.params;
+    const { tutorId } = req.body;
+    try {
+        const subject = await Subject.findById(sid);
+        if (!subject) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Subject not found' 
+            });
+        }
+        if (!subject.tutors || !subject.tutors.includes(tutorId)) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Tutor not assigned to this subject' 
+            });
+        }
+
+        subject.tutors = subject.tutors.filter(id => id.toString() !== tutorId);
+        await subject.save();
+
+        await User.findByIdAndUpdate( tutorId, { $pull: { subjects: sid } }, { new: true });
+
+        return res.status(200).json({ 
+            success: true, 
+            message: 'Tutor removed from subject successfully', 
+            data: subject 
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ 
+            success: false, 
+            message: 'Error removing tutor from subject' 
         });
     }
 }

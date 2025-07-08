@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { getSubjects, getSubjectById, createSubject, updateSubject, deleteSubject, addTeacherToSubject, removeTeacherFromSubject } from "./subject.controller.js";
-import { validateGetSubjects, validateCreateSubject, validateAddTeacherToSubject, validateDeleteSubject, validateGetSubjectById, validateUpdateSubject } from "../middlewares/subject-validator.js";
+import { getSubjects, getSubjectById, createSubject, updateSubject, deleteSubject, addTeacherToSubject, removeTeacherFromSubject, removeTutorFromSubject } from "./subject.controller.js";
+import { validateGetSubjects, validateCreateSubject, validateAddTeacherToSubject, validateDeleteSubject, validateGetSubjectById, validateUpdateSubject, validateRemoveTutorFromSubject } from "../middlewares/subject-validator.js";
 import { uploadSubjectImg } from "../middlewares/cloudinary-uploader.js";
 
 const router = Router()
@@ -12,5 +12,6 @@ router.put("/update/:sid", validateUpdateSubject, updateSubject)
 router.delete("/delete/:sid", validateDeleteSubject, deleteSubject)
 router.put("/addTeacher/:sid", validateAddTeacherToSubject, addTeacherToSubject)
 router.put("/removeTeacher/:sid", validateAddTeacherToSubject, removeTeacherFromSubject) 
+router.put("/removeTutor/:sid", validateRemoveTutorFromSubject, removeTutorFromSubject)
 
 export default router;

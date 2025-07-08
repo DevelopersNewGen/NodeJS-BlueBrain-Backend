@@ -1,13 +1,21 @@
 import Router from 'express';
-import { requestToBeTutor, getAllApplications, updateApplicationStatus } from './application.controller.js';
-import { peticionToBeTutorValidator, getAllApplicationsValidator, approveApplicationValidator } from '../middlewares/application-validator.js';  
-import { upload } from '../middlewares/multer-uploads.js';
+import { requestToBeTutor, getAllApplications, getApplicationsByUser, getApplicationsBySubject, getApplicationById, 
+    updateApplicationStatus } from './application.controller.js';
+import { peticionToBeTutorValidator, getAllApplicationsValidator, getApplicationsByUserValidator, getApplicationsBySubjectValidator, getApplicationByIdValidator,
+    approveApplicationValidator } from '../middlewares/application-validator.js';
+import { uploadEvidence } from '../middlewares/cloudinary-uploader.js';
 
 const router = Router();
 
-router.post('/requestTutor', upload.single("evidence"), peticionToBeTutorValidator, requestToBeTutor);
+router.post('/requestTutor', uploadEvidence.single("evidence"), peticionToBeTutorValidator, requestToBeTutor);
 
 router.get('/', getAllApplicationsValidator, getAllApplications);
+
+router.get('/user/:uid', getApplicationsByUserValidator, getApplicationsByUser);
+
+router.get('/subject/:sid', getApplicationsBySubjectValidator, getApplicationsBySubject);
+
+router.get('/:aid', getApplicationByIdValidator, getApplicationById);
 
 router.patch('/approve/:aid', approveApplicationValidator, updateApplicationStatus);
 

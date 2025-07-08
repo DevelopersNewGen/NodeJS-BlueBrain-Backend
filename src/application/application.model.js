@@ -7,7 +7,7 @@ const applicationSchema = new Schema({
     },
     subject:{
         type: Schema.Types.ObjectId,
-        ref: 'Subjects'
+        ref: 'Subject'
     },
     description: {
         type: String,

@@ -56,4 +56,13 @@ export const validateAddTeacherToSubject = [
     handleErrors
 ];
 
+export const validateRemoveTutorFromSubject = [
+    validateJWT,
+    hasRoles("ADMIN_ROLE", "TEACHER_ROLE"),
+    param('sid').isMongoId().withMessage('Invalid subject id'),
+    body('tutorId').isMongoId().withMessage('Invalid tutor id'),
+    validateField,
+    handleErrors
+];
+
 

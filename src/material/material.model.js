@@ -24,11 +24,6 @@ const materialSchema = new Schema({
         enum: ['4to', '5to', '6to'],
         required: [true, "Grade is required"]
     },
-    type: {
-        type: String,
-        enum: ['pdf', 'video'],
-        required: [true, "Type is required"]
-    },
     fileUrl: {
         type: String,
         required: [true, "File URL is required"]

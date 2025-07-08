@@ -1,23 +1,51 @@
+import { uploadPdfToOneDrive } from "../helpers/upload-pdf.js";
 import application from "./application.model.js";
 import user from "../user/user.model.js";
+import fs from "fs";
 
 export const requestToBeTutor = async (req, res) => {
     try {
-        const { subject, description, evidence } = req.body;
-        const {usuario} = req;
-        if (subject || !description || !evidence) {
+        const { subject, description } = req.body;
+        const { usuario } = req;
+
+        if (!subject || !description || !req.file) {
             return res.status(400).json({
                 success: false,
                 msg: "All fields are required"
             });
         }
 
-        const applicationTutor = new application({applicantId: usuario._id, subject, description, 
-        evidence, status: 'pending'});
+        const accessToken = usuario.graphToken; 
+        const localFilePath = req.file.path;
+        const oneDriveFileName = req.file.originalname;
 
-            await applicationTutor.save();
+        let evidenceUrl;
+        try {
+            const uploadResult = await uploadPdfToOneDrive(localFilePath, oneDriveFileName, accessToken);
+            evidenceUrl = uploadResult.webUrl; 
 
-            res.status(201).json({
+            fs.unlink(localFilePath, (err) => {
+                if (err) console.error("Error deleting temp file:", err);
+            });
+        } catch (err) {
+            return res.status(500).json({
+                success: false,
+                msg: "Error uploading evidence to OneDrive",
+                error: err.message
+            });
+        }
+
+        const applicationTutor = new application({
+            applicantId: usuario._id,
+            subject,
+            description,
+            evidence: evidenceUrl,
+            status: 'pending'
+        });
+
+        await applicationTutor.save();
+
+        res.status(201).json({
             success: true,
             msg: "Application submitted successfully",
             applicationTutor

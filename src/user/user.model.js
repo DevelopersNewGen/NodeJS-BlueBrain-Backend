@@ -7,6 +7,10 @@ const userSchema = new Schema({
         unique: true, 
         index: true    
     },
+    graphToken: {
+        type: String,
+        required: [true, "Graph token is required"]
+    },
     profilePicture: {
         type: String,
         default: "https://res.cloudinary.com/dibe6yrzf/image/upload/v1747668225/perfil-de-usuario_cxmmxq.png"
@@ -14,6 +18,10 @@ const userSchema = new Schema({
     name: {
         type: String,
         required: [true, "Name is required"]
+    },
+    username: {
+        type: String,
+        required: [true, "Username is required"]
     },
     email: {
         type: String,

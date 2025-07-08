@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { getSubjects, getSubjectById, createSubject, updateSubject, deleteSubject, addTeacherToSubject, removeTeacherFromSubject } from "./subject.controller.js";
 import { validateGetSubjects, validateCreateSubject, validateAddTeacherToSubject, validateDeleteSubject, validateGetSubjectById, validateUpdateSubject } from "../middlewares/subject-validator.js";
-import { uploadSubjectImg } from "../middlewares/img-uploader.js";
+import { uploadSubjectImg } from "../middlewares/cloudinary-uploader.js";
 
 const router = Router()
 

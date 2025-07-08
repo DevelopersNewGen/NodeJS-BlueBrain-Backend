@@ -8,7 +8,7 @@ export const login = async (req, res) => {
         `&response_type=code` +
         `&redirect_uri=${encodeURIComponent(process.env.AZURE_REDIRECT_URI)}` +
         `&response_mode=query` +
-        `&scope=openid User.Read email profile`;
+        `&scope=openid profile email User.Read Files.ReadWrite offline_access`;
 
     res.redirect(url);
 };
@@ -21,7 +21,7 @@ export const authCallback = async (req, res) => {
             `https://login.microsoftonline.com/${process.env.AZURE_TENANT_ID}/oauth2/v2.0/token`,
             new URLSearchParams({
                 client_id: process.env.AZURE_CLIENT_ID,
-                scope: 'https://graph.microsoft.com/.default',
+                scope: 'openid profile email User.Read Files.ReadWrite offline_access',
                 code,
                 redirect_uri: process.env.AZURE_REDIRECT_URI,
                 grant_type: 'authorization_code',
@@ -48,11 +48,16 @@ export const authCallback = async (req, res) => {
         if (!dbUser) {
             dbUser = new User({
                 azureId: user.id,
-                name: user.displayName || user.givenName || '',
+                graphToken: accessToken,
+                name: user.givenName + ' ' + user.surname,
+                username: user.displayName,
                 email: user.mail || user.userPrincipalName,
                 role: 'STUDENT_ROLE',
                 subjects: []
             });
+            await dbUser.save();
+        } else {
+            dbUser.graphToken = accessToken;
             await dbUser.save();
         }
 

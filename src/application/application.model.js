@@ -14,10 +14,8 @@ const applicationSchema = new Schema({
         required: [true, "Description is required"]
     },
     evidence: {
-        url: {
-            type: String,
-            required: [true, 'Evidence URL is required']
-        }
+        type: String,
+        required: [true, "Evidence is required"]
     },
     status: {
         type: String,

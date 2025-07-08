@@ -2,7 +2,7 @@ import { Router } from "express";
 import { getUsers, getUserById, updateProfilePictureAdmin, updateProfilePicture, getSubjectUsers, reportUser } from "./user.controller.js";
 import { validateGetUsers, validateGetUserById, validateUpdateProfilePictureAdmin, validateUpdateProfilePicture, validateGetSubjectUsers, 
     validateReportUser } from "../middlewares/user-validator.js";
-import { uploadUserImg } from "../middlewares/img-uploader.js";
+import { uploadUserImg } from "../middlewares/cloudinary-uploader.js";
 
 const router = Router();
 

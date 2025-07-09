@@ -11,6 +11,7 @@ import userRoutes from "../src/user/user.routes.js";
 import reportRoutes from "../src/report/report.routes.js";
 import applicationRoutes from "../src/application/application.routes.js";
 import {createDefaultAdmin, createDefaultSubject} from "./default-data.js";
+import materialRoutes from "../src/material/material.routes.js";
 
 const middlewares = (app) => {
   app.use(express.urlencoded({ extended: false }));
@@ -27,6 +28,7 @@ const routes = (app) => {
   app.use("/BlueBrain/v1/users", userRoutes);
   app.use("/BlueBrain/v1/reports", reportRoutes);
   app.use("/BlueBrain/v1/applications", applicationRoutes);
+  app.use("/BlueBrain/v1/materials", materialRoutes);
 };
 
 const conectarDB = async () => {

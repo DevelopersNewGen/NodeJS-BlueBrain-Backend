@@ -51,8 +51,8 @@ const getZoomToken = async (req, res) => {
     const { data } = await axios.post(
         `https://zoom.us/oauth/token`,
         qs.stringify({
-        grant_type: 'account_credentials',
-        account_id: process.env.ZOOM_ACCOUNT_ID,
+            grant_type: 'account_credentials',
+            account_id: process.env.ZOOM_ACCOUNT_ID,
         }),
         { headers: { Authorization: `Basic ${auth}` } }
     );
@@ -60,23 +60,21 @@ const getZoomToken = async (req, res) => {
     return data.access_token;
 }
 
-export const createPrivTutorial = async (req, res) => {
+export const createPrivTutorial = async (host, date, topic) => {
     try {
-        const { topic } = req.body;
-        const { usuario } = req;
-        const startISO = new Date().toISOString();
+        const startISO = date.toISOString();
 
-        const hostId = usuario.zoomAccount
+        const hostId = host.zoomAccount
 
         const zoomToken = await getZoomToken(req, res);
 
-        const {data} =  await axios.post(
+        const { data } = await axios.post(
             `https://api.zoom.us/v2/users/${hostId}/meetings`,
             {
                 topic,
-                type: 2,           
+                type: 2,
                 start_time: startISO,
-                duration: 40,      
+                duration: 60,
                 settings: {
                     join_before_host: true,
                     approval_type: 2
@@ -85,17 +83,51 @@ export const createPrivTutorial = async (req, res) => {
             { headers: { Authorization: `Bearer ${zoomToken}` } }
         );
 
-        return res.status(201).json({
+        return data.join_url
+    } catch (error) {
+        return error.response.data;
+    }
+}
+
+export const updateStatus = async (req, res) => {
+    const { ptid } = req.params;
+    const { newStatus, date } = req.body;
+
+    try {
+        const tutorial = await privTutorial.findById(ptid);
+
+        if (!tutorial) {
+            return res.status(404).json({
+                success: false,
+                message: 'Private tutorial not found'
+            });
+        }
+
+        if (tutorial.status !== 'PENDING') {
+            return res.status(400).json({
+                success: false,
+                message: 'Private tutorial is not pending'
+            });
+        }
+
+        tutorial.status = newStatus;
+        if (newStatus === 'COMPLETED') {
+            tutorial.date = date || new Date();
+            tutorial.time = date.toLocaleTimeString();
+        }
+
+        await tutorial.save();
+
+        return res.status(200).json({
             success: true,
-            message: 'Private tutorial created successfully',
-            link: data.join_url,
+            message: 'Private tutorial status updated successfully',
+            data: tutorial
         });
     } catch (error) {
         console.error(error);
         return res.status(500).json({
             success: false,
-            message: 'Error creating private tutorial'
+            message: 'Error updating private tutorial status'
         });
-        
     }
 }

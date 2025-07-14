@@ -6,6 +6,5 @@ const router = Router();
 
 router.get("/", validateGetPrivTutorials, getPrivTutorials);
 router.get("/:ptid", validateGetPrivTutorialById, getPrivTutorialById);
-router.post("/priv", validateCreatePrivTutorial, createPrivTutorial);
 
 export default router;

@@ -21,7 +21,7 @@ export const authCallback = async (req, res) => {
             `https://login.microsoftonline.com/${process.env.AZURE_TENANT_ID}/oauth2/v2.0/token`,
             new URLSearchParams({
                 client_id: process.env.AZURE_CLIENT_ID,
-                scope: 'openid profile email User.Read Files.ReadWrite offline_access',
+                scope: 'https://graph.microsoft.com/.default',
                 code,
                 redirect_uri: process.env.AZURE_REDIRECT_URI,
                 grant_type: 'authorization_code',
@@ -48,39 +48,29 @@ export const authCallback = async (req, res) => {
         if (!dbUser) {
             dbUser = new User({
                 azureId: user.id,
-                graphToken: accessToken,
-                name: user.givenName + ' ' + user.surname,
-                username: user.displayName,
+                name: user.displayName || user.givenName || '',
                 email: user.mail || user.userPrincipalName,
                 role: 'STUDENT_ROLE',
                 subjects: []
             });
             await dbUser.save();
-        } else {
-            dbUser.graphToken = accessToken;
-            await dbUser.save();
         }
 
         const webToken = await generateJWT(dbUser._id);
 
-        return res.status(200).json({
-            success: true,
-            message: 'Authentication successful',
-            userDetails: {
-                email: dbUser.email,
-                name: dbUser.name,
-                img: null,
-                token: webToken
-            }
-        });
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        const redirectUrl = `${frontendUrl}/auth/callback?token=${webToken}&user=${encodeURIComponent(JSON.stringify({
+            email: dbUser.email,
+            name: dbUser.name,
+            img: null
+        }))}`;
+
+        return res.redirect(redirectUrl);
 
     } catch (error) {
         console.error('Error in authCallback:', error.response?.data || error.message);
-        return res.status(500).json({
-            success: false,
-            message: 'Authentication failed',
-            error: error.response?.data || error.message
-        });
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        return res.redirect(`${frontendUrl}/auth/error`);
     }
 };
 

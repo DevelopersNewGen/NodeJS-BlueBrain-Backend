@@ -1,6 +1,6 @@
 import privTutorial from "./privTutorial.model.js";
 import axios from "axios";
-import qs from "qs";
+import { getMicrosoftAccessToken } from "../utils/ms-auth.js"; // Debes implementar esto
 
 export const getPrivTutorials = async (req, res) => {
     try {
@@ -43,51 +43,23 @@ export const getPrivTutorialById = async (req, res) => {
     }
 }
 
-const getZoomToken = async (req, res) => {
-    const auth = Buffer.from(
-        `${process.env.ZOOM_CLIENT_ID}:${process.env.ZOOM_CLIENT_SECRET}`
-    ).toString('base64');
-
-    const { data } = await axios.post(
-        `https://zoom.us/oauth/token`,
-        qs.stringify({
-            grant_type: 'account_credentials',
-            account_id: process.env.ZOOM_ACCOUNT_ID,
-        }),
-        { headers: { Authorization: `Basic ${auth}` } }
+export const createTeamsMeeting = async (accessToken, subject, startDateTime, endDateTime) => {
+    const response = await axios.post(
+        'https://graph.microsoft.com/v1.0/me/onlineMeetings',
+        {
+            subject,
+            startDateTime,
+            endDateTime
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            }
+        }
     );
-
-    return data.access_token;
-}
-
-export const createPrivTutorial = async (host, date, topic) => {
-    try {
-        const startISO = date.toISOString();
-
-        const hostId = host.zoomAccount
-
-        const zoomToken = await getZoomToken(req, res);
-
-        const { data } = await axios.post(
-            `https://api.zoom.us/v2/users/${hostId}/meetings`,
-            {
-                topic,
-                type: 2,
-                start_time: startISO,
-                duration: 60,
-                settings: {
-                    join_before_host: true,
-                    approval_type: 2
-                }
-            },
-            { headers: { Authorization: `Bearer ${zoomToken}` } }
-        );
-
-        return data.join_url
-    } catch (error) {
-        return error.response.data;
-    }
-}
+    return response.data.joinUrl;
+};
 
 export const updateStatus = async (req, res) => {
     const { ptid } = req.params;
@@ -131,3 +103,42 @@ export const updateStatus = async (req, res) => {
         });
     }
 }
+
+export const acceptPrivTutorial = async (req, res) => {
+    const { ptid } = req.params;
+    const { date, duration } = req.body;
+    const usuario = req.usuario; 
+
+    try {
+        const tutorial = await privTutorial.findById(ptid);
+        if (!tutorial) {
+            return res.status(404).json({ 
+                success: false,
+                 message: "Tutorial not found" 
+                });
+        }
+
+        const startDateTime = date || new Date();
+        const endDateTime = new Date(new Date(startDateTime).getTime() + (duration || 60) * 60000).toISOString();
+        const joinUrl = await createTeamsMeeting(
+            usuario.graphToken,
+            tutorial.topic,
+            new Date(startDateTime).toISOString(),
+            endDateTime
+        );
+
+        tutorial.meetingLink = joinUrl;
+        tutorial.status = "ACCEPTED";
+        await tutorial.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Teams meeting created and tutorial accepted",
+            data: tutorial
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, message: "Error accepting tutorial" });
+    }
+};
+

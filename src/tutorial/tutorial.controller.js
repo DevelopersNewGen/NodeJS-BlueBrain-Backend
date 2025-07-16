@@ -74,7 +74,7 @@ export const createTutorial = async (req, res) => {
         });
 
         await newTutorial.save();
-        
+
         return res.status(201).json({
             success: true,
             message: 'Tutorial created successfully',
@@ -236,15 +236,7 @@ export const acceptTutorial = async (req, res) => {
 
         tutorial.status = newStatus;
 
-        tutorial.participants.push(usuario._id);
-
-        if (tutorial.participants.length >= 10) {
-            tutorial.status = 'FULL';
-        }
-
         if (tutorial.access === 'PRIVATE') {
-            const tutorialDate = date || new Date();
-            const link = await createPrivTutorial(host, tutorialDate, tutorial.topic);
 
             const newPrivTutorial = new privTutorial({
                 host: tutorial.host,

@@ -30,7 +30,7 @@ const privTutorialSchema = new Schema({
     },
     status: {
         type: String,
-        enum: ['PENDING', 'COMPLETED', 'CANCELLED'],
+        enum: ['PENDING', 'ACCEPTED', 'CANCELLED'],
         default: 'PENDING'
     },
     feedBack: [

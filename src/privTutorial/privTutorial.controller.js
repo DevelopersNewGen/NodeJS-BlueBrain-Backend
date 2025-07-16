@@ -1,6 +1,5 @@
 import privTutorial from "./privTutorial.model.js";
 import axios from "axios";
-import { getMicrosoftAccessToken } from "../utils/ms-auth.js"; // Debes implementar esto
 
 export const getPrivTutorials = async (req, res) => {
     try {

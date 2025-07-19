@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getUsers, getUserById, updateProfilePictureAdmin, updateProfilePicture, getSubjectUsers, reportUser } from "./user.controller.js";
+import { getUsers, getUserById, updateProfilePictureAdmin, updateProfilePicture, getSubjectUsers, reportUser, getUserRoleById } from "./user.controller.js";
 import { validateGetUsers, validateGetUserById, validateUpdateProfilePictureAdmin, validateUpdateProfilePicture, validateGetSubjectUsers, 
     validateReportUser } from "../middlewares/user-validator.js";
 import { uploadUserImg } from "../middlewares/cloudinary-uploader.js";
@@ -12,5 +12,6 @@ router.patch("/updateProfilePictureAdmin/:id", uploadUserImg.single("img"), vali
 router.patch("/updateProfilePicture", uploadUserImg.single("img"), validateUpdateProfilePicture, updateProfilePicture);
 router.get("/subject/:subjectId", validateGetSubjectUsers, getSubjectUsers);
 router.post("/report", validateReportUser, reportUser);
+router.get("/role/:id", getUserRoleById);
 
 export default router;

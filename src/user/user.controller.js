@@ -171,3 +171,25 @@ export const reportUser = async (req, res) => {
 }
 
 
+export const getUserRoleById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+        return res.status(200).json({
+            success: true,
+            role: user.role
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Error retrieving user role',
+            error
+        });
+    }
+};

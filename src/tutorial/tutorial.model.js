@@ -32,10 +32,6 @@ const tutorial = new Schema({
         type: Date,
         required: [true, "End time is required"]
     },
-    participants: [{
-        type: Schema.Types.ObjectId,
-        ref: 'User'
-    }],
     status: {
         type: String,
         enum: ['EXPIRED', 'INCOURSE', 'CANCELLED', 'COMPLETED', 'FULL'],

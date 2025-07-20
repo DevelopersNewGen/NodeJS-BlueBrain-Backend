@@ -6,7 +6,7 @@ export const requestToBeTutor = async (req, res) => {
 	try {
 		let img = req.file;
 
-		const { subject, description, zoomAccount } = req.body;
+		const { subject, description } = req.body;
 		const { usuario } = req;
 
 		const evidenceUrl = img ? img.path : null;
@@ -22,7 +22,6 @@ export const requestToBeTutor = async (req, res) => {
 			applicantId: usuario._id,
 			subject,
 			description,
-			zoomAccount,
 			evidence: evidenceUrl,
 			status: 'pending'
 		});
@@ -179,7 +178,7 @@ export const updateApplicationStatus = async (req, res) => {
 		if (status === 'approved') {
 			await user.findByIdAndUpdate(
 				updatedApplication.applicantId,
-				{ $addToSet: { subjects: updatedApplication.subject }, zoomAccount: updatedApplication.zoomAccount, role: "TUTOR_ROLE" }
+				{ $addToSet: { subjects: updatedApplication.subject },  role: "TUTOR_ROLE" }
 			);
 			await Subject.findByIdAndUpdate( app.subject._id, 
 				{ $addToSet: { tutors: updatedApplication.applicantId } },

@@ -1,12 +1,12 @@
-import {Schema, model} from 'mongoose';
+import { Schema, model } from "mongoose";
 
-const privTutorialSchema = new Schema({
-    studentId: {
+const privTutorial = new Schema({
+    tutor: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
-    tutorId: {
+    student: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
@@ -16,53 +16,59 @@ const privTutorialSchema = new Schema({
         ref: 'Subject',
         required: true
     },
-    date: {
+    topic: {
+        type: String,
+        required: true
+    },
+    description: {
+        type: String,
+        required: true
+    },
+    scheduledDate: {
         type: Date,
         required: true
     },
-    time: {
-        type: String,
+    scheduledEndTime: {
+        type: Date,
         required: true
     },
+    actualDate: {
+        type: Date
+    },
+    actualTime: {
+        type: String
+    },
+    duration: {
+        type: Number,
+        default: 60
+    },
     meetingLink: {
-        type: String,
-        required: true
+        type: String
     },
     status: {
         type: String,
-        enum: ['PENDING', 'ACCEPTED', 'CANCELLED'],
+        enum: ['PENDING', 'ACCEPTED', 'REJECTED', 'COMPLETED', 'CANCELLED'],
         default: 'PENDING'
     },
-    feedBack: [
-        {
-            comment: {
-                type: String,
-                required: true,
-                trim: true,
-                minlength: [10, "Comment must be at least 10 characters long"],
-                maxlength: [500, "Comment must be at most 500 characters long"]
-            },
-            rating: {
-                type: Number,
-                required: true,
-                min: 1,
-                max: 5
-            },
-        }
-    ],
-    resources: {
-        type: String,
-        required: false,
-        trim: true
+    acceptedBy: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
     },
+    acceptedAt: {
+        type: Date
+    },
+    relatedTutorial: {
+        type: Schema.Types.ObjectId,
+        ref: 'Tutorial'
+    }
 }, {
-    timestamps: true,
+    timestamps: true
 });
 
-privTutorialSchema.methods.toJSON = function () {
+privTutorial.methods.toJSON = function () {
     const { _id, __v, ...privTutorial } = this.toObject();
     privTutorial.ptid = _id; 
     return privTutorial;
 }
 
-export default model('PrivTutorial', privTutorialSchema);
+export default model('PrivTutorial', privTutorial);

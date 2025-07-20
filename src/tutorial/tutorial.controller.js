@@ -1,7 +1,6 @@
 import Tutorial from "./tutorial.model.js";
 import User from "../user/user.model.js";
 import privTutorial from "../privTutorial/privTutorial.model.js";
-import { createPrivTutorial } from "../privTutorial/privTutorial.controller.js";
 
 export const getTutorials = async (req, res) => {
     try {
@@ -75,6 +74,7 @@ export const createTutorial = async (req, res) => {
 
         await newTutorial.save();
 
+
         return res.status(201).json({
             success: true,
             message: 'Tutorial created successfully',
@@ -84,7 +84,67 @@ export const createTutorial = async (req, res) => {
         console.error(error);
         return res.status(500).json({
             success: false,
-            message: 'Error creating tutorial'
+            message: 'Error creating tutorial',
+            error: error.message
+        });
+    }
+}
+
+export const requestTutorial = async (req, res) => {
+    const { tid } = req.params;
+    const { usuario } = req;
+    try {
+        const { startTime, endTime} = req.body;
+
+        const tutorial = await Tutorial.findById(tid);
+
+        if (!tutorial) {
+            return res.status(404).json({
+                success: false,
+                message: 'Tutorial not found'
+            });
+        }
+
+        if (tutorial.status !== 'INCOURSE') {
+            return res.status(400).json({
+                success: false,
+                message: 'Tutorial is not available for requests'
+            });
+        }
+        
+        if (tutorial.host.toString() === usuario._id.toString()) {
+            return res.status(400).json({
+                success: false,
+                message: 'You cannot request your own tutorial'
+            });
+        }
+
+        if (tutorial.access === 'PRIVATE') {
+            const newPrivTutorial = new privTutorial({
+                tutor: tutorial.host, 
+                student: usuario._id,
+                subject: tutorial.subject,
+                topic: tutorial.topic,
+                description: tutorial.description,
+                scheduledDate: startTime,
+                scheduledEndTime: endTime,
+                status: 'PENDING',
+                relatedTutorial: tid
+            });
+            await newPrivTutorial.save();
+        }
+
+
+        return res.status(201).json({
+            success: true,
+            message: 'Private tutorial request created successfully',
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Error requesting tutorial',
+            error: error.message
         });
     }
 }
@@ -196,72 +256,3 @@ export const getTutorialsBySubject = async (req, res) => {
     }
 }
 
-export const acceptTutorial = async (req, res) => {
-    const { tid } = req.params;
-    const { usuario } = req;
-    const { newStatus, date } = req.body;
-
-    try {
-        const tutorial = await Tutorial.findById(tid);
-
-        const host = await User.findById(tutorial.host);
-
-        if (!tutorial) {
-            return res.status(404).json({
-                success: false,
-                message: 'Tutorial not found'
-            });
-        }
-
-        if (tutorial.status !== 'INCOURSE') {
-            return res.status(400).json({
-                success: false,
-                message: 'Tutorial is not in progress'
-            });
-        }
-
-        if (tutorial.host.toString() === usuario._id.toString()) {
-            return res.status(400).json({
-                success: false,
-                message: 'Host cannot accept their own tutorial'
-            });
-        }
-
-        if (tutorial.status === 'FULL') {
-            return res.status(400).json({
-                success: false,
-                message: 'Tutorial is full'
-            });
-        }
-
-        tutorial.status = newStatus;
-
-        if (tutorial.access === 'PRIVATE') {
-
-            const newPrivTutorial = new privTutorial({
-                host: tutorial.host,
-                subject: tutorial.subject,
-                date: tutorialDate,
-                time: tutorialDate.toLocaleTimeString(),
-                meetingLink: link,
-                status: 'PENDING',
-            });
-
-            await newPrivTutorial.save();
-        }
-
-        await tutorial.save();
-
-        return res.status(200).json({
-            success: true,
-            message: 'Tutorial accepted successfully',
-            data: tutorial
-        });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({
-            success: false,
-            message: 'Error accepting tutorial'
-        });
-    }
-}

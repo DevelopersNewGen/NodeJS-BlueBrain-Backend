@@ -8,7 +8,7 @@ export const login = async (req, res) => {
         `&response_type=code` +
         `&redirect_uri=${encodeURIComponent(process.env.AZURE_REDIRECT_URI)}` +
         `&response_mode=query` +
-        `&scope=openid profile email User.Read Files.ReadWrite offline_access`;
+        `&scope=openid profile email User.Read Files.ReadWrite OnlineMeetings.ReadWrite offline_access`;
 
     res.redirect(url);
 };
@@ -21,7 +21,7 @@ export const authCallback = async (req, res) => {
             `https://login.microsoftonline.com/${process.env.AZURE_TENANT_ID}/oauth2/v2.0/token`,
             new URLSearchParams({
                 client_id: process.env.AZURE_CLIENT_ID,
-                scope: 'https://graph.microsoft.com/.default',
+                scope: 'openid profile email User.Read Files.ReadWrite OnlineMeetings.ReadWrite offline_access',
                 code,
                 redirect_uri: process.env.AZURE_REDIRECT_URI,
                 grant_type: 'authorization_code',
@@ -35,6 +35,14 @@ export const authCallback = async (req, res) => {
         );
 
         const accessToken = tokenResponse.data.access_token;
+        const refreshToken = tokenResponse.data.refresh_token;
+
+        // Agregar logs para debugging
+        console.log('Token response data:', {
+            access_token: accessToken ? 'Present' : 'Missing',
+            refresh_token: refreshToken ? 'Present' : 'Missing',
+            expires_in: tokenResponse.data.expires_in
+        });
 
         const userResponse = await axios.get('https://graph.microsoft.com/v1.0/me', {
             headers: {
@@ -48,16 +56,35 @@ export const authCallback = async (req, res) => {
         if (!dbUser) {
             dbUser = new User({
                 azureId: user.id,
+                username: user.userPrincipalName || user.mail, // Agregar username
                 name: user.displayName || user.givenName || '',
                 email: user.mail || user.userPrincipalName,
                 role: 'STUDENT_ROLE',
-                subjects: []
+                subjects: [],
+                graphToken: accessToken,
+                refreshToken: refreshToken,
+                tokenExpiry: new Date(Date.now() + tokenResponse.data.expires_in * 1000)
             });
-            await dbUser.save();
+        } else {
+            dbUser.graphToken = accessToken;
+            dbUser.refreshToken = refreshToken; 
+            dbUser.tokenExpiry = new Date(Date.now() + tokenResponse.data.expires_in * 1000);
         }
+        
+        await dbUser.save();
+
+        console.log('User saved with tokens:', {
+            userId: dbUser._id,
+            hasGraphToken: !!dbUser.graphToken,
+            hasRefreshToken: !!dbUser.refreshToken,
+            tokenExpiry: dbUser.tokenExpiry
+
+        });
 
         const webToken = await generateJWT(dbUser._id);
 
+        console.log('Generated web token:', webToken);  
+        console.log(dbUser);
         const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
         const redirectUrl = `${frontendUrl}/auth/callback?token=${webToken}&user=${encodeURIComponent(JSON.stringify({
             email: dbUser.email,

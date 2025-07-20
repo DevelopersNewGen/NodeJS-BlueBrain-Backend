@@ -13,6 +13,7 @@ import applicationRoutes from "../src/application/application.routes.js";
 import {createDefaultAdmin, createDefaultSubject} from "./default-data.js";
 import materialRoutes from "../src/material/material.routes.js";
 import privTutoRoutes from "../src/privTutorial/privTutorial.routes.js";
+import tutorialRoutes from "../src/tutorial/tutorial.routes.js";
 
 const middlewares = (app) => {
   app.use(express.urlencoded({ extended: false }));
@@ -31,6 +32,7 @@ const routes = (app) => {
   app.use("/BlueBrain/v1/applications", applicationRoutes);
   app.use("/BlueBrain/v1/materials", materialRoutes);
   app.use("/BlueBrain/v1/privTutorials", privTutoRoutes);
+  app.use("/BlueBrain/v1/tutorials", tutorialRoutes); 
 };
 
 const conectarDB = async () => {

@@ -6,7 +6,7 @@ export const requestToBeTutor = async (req, res) => {
 	try {
 		let img = req.file;
 
-		const { subject, description } = req.body;
+		const { subject, description, zoomAccount } = req.body;
 		const { usuario } = req;
 
 		const evidenceUrl = img ? img.path : null;
@@ -22,6 +22,7 @@ export const requestToBeTutor = async (req, res) => {
 			applicantId: usuario._id,
 			subject,
 			description,
+			zoomAccount,
 			evidence: evidenceUrl,
 			status: 'pending'
 		});

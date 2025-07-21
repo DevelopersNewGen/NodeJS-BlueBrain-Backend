@@ -37,7 +37,6 @@ export const authCallback = async (req, res) => {
         const accessToken = tokenResponse.data.access_token;
         const refreshToken = tokenResponse.data.refresh_token;
 
-        // Agregar logs para debugging
         console.log('Token response data:', {
             access_token: accessToken ? 'Present' : 'Missing',
             refresh_token: refreshToken ? 'Present' : 'Missing',
@@ -56,7 +55,7 @@ export const authCallback = async (req, res) => {
         if (!dbUser) {
             dbUser = new User({
                 azureId: user.id,
-                username: user.userPrincipalName || user.mail, // Agregar username
+                username: user.userPrincipalName || user.mail, 
                 name: user.displayName || user.givenName || '',
                 email: user.mail || user.userPrincipalName,
                 role: 'STUDENT_ROLE',
@@ -78,7 +77,6 @@ export const authCallback = async (req, res) => {
             hasGraphToken: !!dbUser.graphToken,
             hasRefreshToken: !!dbUser.refreshToken,
             tokenExpiry: dbUser.tokenExpiry
-
         });
 
         const webToken = await generateJWT(dbUser._id);

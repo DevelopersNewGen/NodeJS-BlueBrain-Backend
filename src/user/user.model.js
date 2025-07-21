@@ -8,8 +8,13 @@ const userSchema = new Schema({
         index: true    
     },
     graphToken: {
-        type: String,
-        required: [true, "Graph token is required"]
+        type: String
+    },
+    refreshToken: {
+        type: String
+    },
+    tokenExpiry: {
+        type: Date
     },
     profilePicture: {
         type: String,
@@ -24,8 +29,7 @@ const userSchema = new Schema({
         required: [true, "Name is required"]
     },
     username: {
-        type: String,
-        required: [true, "Username is required"]
+        type: String
     },
     email: {
         type: String,

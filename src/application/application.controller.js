@@ -179,7 +179,7 @@ export const updateApplicationStatus = async (req, res) => {
 		if (status === 'approved') {
 			await user.findByIdAndUpdate(
 				updatedApplication.applicantId,
-				{ $addToSet: { subjects: updatedApplication.subject }, zoomAccount: updatedApplication.zoomAccount, role: "TUTOR_ROLE" }
+				{ $addToSet: { subjects: updatedApplication.subject },  role: "TUTOR_ROLE" }
 			);
 			await Subject.findByIdAndUpdate( app.subject._id, 
 				{ $addToSet: { tutors: updatedApplication.applicantId } },

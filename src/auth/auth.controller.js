@@ -87,7 +87,7 @@ export const authCallback = async (req, res) => {
         const redirectUrl = `${frontendUrl}/auth/callback?token=${webToken}&user=${encodeURIComponent(JSON.stringify({
             email: dbUser.email,
             name: dbUser.name,
-            img: null
+            profilePicture: dbUser.profilePicture 
         }))}`;
 
         return res.redirect(redirectUrl);

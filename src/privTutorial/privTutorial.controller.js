@@ -246,49 +246,6 @@ const refreshUserToken = async (refreshToken) => {
     }
 };
 
-export const updateStatusPrivTutorial = async (req, res) => {
-    const { ptid } = req.params;
-    const { newStatus, date } = req.body;
-
-    try {
-        const tutorial = await privTutorial.findById(ptid);
-
-        if (!tutorial) {
-            return res.status(404).json({
-                success: false,
-                message: 'Private tutorial not found'
-            });
-        }
-
-        if (tutorial.status !== 'PENDING') {
-            return res.status(400).json({
-                success: false,
-                message: 'Private tutorial is not pending'
-            });
-        }
-
-        tutorial.status = newStatus;
-        if (newStatus === 'COMPLETED') {
-            tutorial.actualDate = date || new Date();
-            tutorial.actualTime = date.toLocaleTimeString();
-        }
-
-        await tutorial.save();
-
-        return res.status(200).json({
-            success: true,
-            message: 'Private tutorial status updated successfully',
-            data: tutorial
-        });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({
-            success: false,
-            message: 'Error updating private tutorial status'
-        });
-    }
-}
-
 export const getTutorialByStudent = async (req, res) => {
     const { studentId } = req.params;
 

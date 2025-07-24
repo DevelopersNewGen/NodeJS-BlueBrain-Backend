@@ -10,9 +10,10 @@ import subjectRoutes from "../src/subject/subject.routes.js";
 import userRoutes from "../src/user/user.routes.js";
 import reportRoutes from "../src/report/report.routes.js";
 import applicationRoutes from "../src/application/application.routes.js";
-import {createDefaultAdmin, createDefaultSubject} from "./default-data.js";
+import {createDefaultAdmin, createDefaultSubject, asignDefaultTeacher} from "./default-data.js";
 import materialRoutes from "../src/material/material.routes.js";
 import privTutoRoutes from "../src/privTutorial/privTutorial.routes.js";
+import publicTutoRoutes from "../src/publicTutorial/publicTutorial.routes.js"
 import tutorialRoutes from "../src/tutorial/tutorial.routes.js";
 
 const middlewares = (app) => {
@@ -33,6 +34,7 @@ const routes = (app) => {
   app.use("/BlueBrain/v1/materials", materialRoutes);
   app.use("/BlueBrain/v1/privTutorials", privTutoRoutes);
   app.use("/BlueBrain/v1/tutorials", tutorialRoutes); 
+  app.use("/BlueBrain/v1/publicTutorials", publicTutoRoutes)
 };
 
 const conectarDB = async () => {
@@ -51,6 +53,7 @@ export const initServer = () => {
     conectarDB();
     createDefaultAdmin();
     createDefaultSubject();
+    asignDefaultTeacher();
     routes(app);
     const port = process.env.PORT;
     app.listen(port, () => {

@@ -20,10 +20,6 @@ const userSchema = new Schema({
         type: String,
         default: "https://res.cloudinary.com/dibe6yrzf/image/upload/v1747668225/perfil-de-usuario_cxmmxq.png"
     },
-    zoomAccount: {
-        type: String,
-        unique: true,
-    },
     name: {
         type: String,
         required: [true, "Name is required"]

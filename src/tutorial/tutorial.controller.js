@@ -1,6 +1,9 @@
 import Tutorial from "./tutorial.model.js";
 import User from "../user/user.model.js";
 import privTutorial from "../privTutorial/privTutorial.model.js";
+import publicTutorial from "../publicTutorial/publicTutorial.model.js";
+import { createTeamsMeeting } from "../publicTutorial/publicTutorial.controller.js";
+import { DateTime } from 'luxon';
 
 export const getTutorials = async (req, res) => {
     try {
@@ -93,8 +96,16 @@ export const createTutorial = async (req, res) => {
 export const requestTutorial = async (req, res) => {
     const { tid } = req.params;
     const { usuario } = req;
+
     try {
-        const { startTime, endTime} = req.body;
+        const { startTime, endTime } = req.body;
+
+        const localStart = DateTime.fromJSDate(new Date(startTime), {
+            zone: 'America/Guatemala'
+        });
+        const localEnd = DateTime.fromJSDate(new Date(endTime), {
+            zone: 'America/Guatemala'
+        });
 
         const tutorial = await Tutorial.findById(tid);
 
@@ -111,7 +122,7 @@ export const requestTutorial = async (req, res) => {
                 message: 'Tutorial is not available for requests'
             });
         }
-        
+
         if (tutorial.host.toString() === usuario._id.toString()) {
             return res.status(400).json({
                 success: false,
@@ -121,24 +132,61 @@ export const requestTutorial = async (req, res) => {
 
         if (tutorial.access === 'PRIVATE') {
             const newPrivTutorial = new privTutorial({
-                tutor: tutorial.host, 
+                tutor: tutorial.host,
                 student: usuario._id,
                 subject: tutorial.subject,
                 topic: tutorial.topic,
                 description: tutorial.description,
-                scheduledDate: startTime,
-                scheduledEndTime: endTime,
+                scheduledDate: localStart.toJSDate(),
+                scheduledEndTime: localEnd.toJSDate(),
                 status: 'PENDING',
                 relatedTutorial: tid
             });
             await newPrivTutorial.save();
         }
 
+        if (tutorial.access === 'PUBLIC') {
+            let meetingLink = '';
+            const tutor = await User.findById(tutorial.host);
+            const graphToken = tutor?.graphToken;
+
+            if (graphToken) {
+                try {
+                    meetingLink = await createTeamsMeeting(
+                        graphToken,
+                        `${tutor.name} - ${tutorial.topic} - ${tutorial.subject?.name || 'No Subject'}`,
+                        localStart.toUTC().toISO(),
+                        localEnd.toUTC().toISO()
+                    );
+                } catch (error) {
+                    console.error('Error creating Teams meeting:', error);
+                    return res.status(500).json({
+                        success: false,
+                        message: 'Error creating Teams meeting'
+                    });
+                }
+            }
+
+            const newPublicTutorial = new publicTutorial({
+                tutor: tutorial.host,
+                student: usuario._id,
+                subject: tutorial.subject,
+                topic: tutorial.topic,
+                description: tutorial.description,
+                scheduledDate: localStart.toJSDate(),
+                scheduledEndTime: localEnd.toJSDate(),
+                status: 'PENDING',
+                relatedTutorial: tid,
+                meetingLink
+            });
+            await newPublicTutorial.save();
+        }
 
         return res.status(201).json({
             success: true,
-            message: 'Private tutorial request created successfully',
+            message: 'Tutorial request created successfully',
         });
+
     } catch (error) {
         console.error(error);
         return res.status(500).json({
@@ -147,7 +195,7 @@ export const requestTutorial = async (req, res) => {
             error: error.message
         });
     }
-}
+};
 
 export const updateTutorial = async (req, res) => {
     const { tid } = req.params;

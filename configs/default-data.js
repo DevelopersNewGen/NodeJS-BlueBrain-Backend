@@ -50,3 +50,23 @@ export const createDefaultSubject = async () => {
         console.error('Error creando materia por defecto:', error);
     }
 }
+
+export const asignDefaultTeacher = async () => {
+    try {
+        const subject = await Subject.findOne({ name: 'Matemática' });
+        if (!subject) {
+            console.log('Materia Matemática no encontrada.');
+            return;
+        }
+        const teacher = await User.findOne({ email: 'brayanjoj@kinal.edu.gt' });
+        if (!teacher) {
+            console.log('Profesor no encontrado.');
+            return;
+        }
+        subject.teachers.push(teacher._id);
+        await subject.save();
+        console.log('Profesor asignado a la materia Matemática.');
+    } catch (error) {
+        console.error('Error asignando profesor a materia:', error);
+    }
+}

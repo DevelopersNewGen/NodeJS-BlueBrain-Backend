@@ -13,10 +13,6 @@ const applicationSchema = new Schema({
         type: String,
         required: [true, "Description is required"]
     },
-    zoomAccount: {
-        type: String,
-        required: [true, "Zoom account is required"]
-    },
     evidence: {
         type: String,
         required: [true, "Evidence is required"]

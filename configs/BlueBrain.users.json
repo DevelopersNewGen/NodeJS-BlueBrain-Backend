@@ -1,0 +1,77 @@
+[{
+  "_id": {
+    "$oid": "68689507c9a7e1a8b1eba8ed"
+  },
+  "azureId": "dca6e365-a41e-4416-a8b4-1ed5ac018aff",
+  "profilePicture": "https://res.cloudinary.com/dibe6yrzf/image/upload/v1747668225/perfil-de-usuario_cxmmxq.png",
+  "name": "atum-2023017",
+  "email": "atum-2023017@kinal.edu.gt",
+  "role": "TEACHER_ROLE",
+  "subjects": [],
+  "rating": 0,
+  "createdAt": {
+    "$date": "2025-07-05T02:59:19.122Z"
+  },
+  "updatedAt": {
+    "$date": "2025-07-05T02:59:19.122Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6868962ac9a7e1a8b1eba8f1"
+  },
+  "azureId": "db4c7c7a-31a9-4033-9b90-e97c56229d49",
+  "profilePicture": "https://res.cloudinary.com/dibe6yrzf/image/upload/v1747668225/perfil-de-usuario_cxmmxq.png",
+  "profilePicture": "https://res.cloudinary.com/dibe6yrzf/image/upload/v1751750418/user/profilePicture/yo-f1cb942a.jpg",
+  "name": "lxocoy-2023020",
+  "email": "lxocoy-2023020@kinal.edu.gt",
+  "role": "STUDENT_ROLE",
+  "subjects": [],
+  "rating": 0,
+  "createdAt": {
+    "$date": "2025-07-05T03:04:10.034Z"
+  },
+  "updatedAt": {
+    "$date": "2025-07-05T03:04:10.034Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68689670c9a7e1a8b1eba8f4"
+  },
+  "azureId": "3bc64226-6dcb-43a9-a80a-62adc62e3528",
+  "profilePicture": "https://res.cloudinary.com/dibe6yrzf/image/upload/v1747668225/perfil-de-usuario_cxmmxq.png",
+  "name": "esocop-2023011",
+  "email": "esocop-2023011@kinal.edu.gt",
+  "role": "STUDENT_ROLE",
+  "subjects": [],
+  "rating": 0,
+  "createdAt": {
+    "$date": "2025-07-05T03:05:20.483Z"
+  },
+  "updatedAt": {
+    "$date": "2025-07-05T03:05:20.483Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "68689821a7daf00b24499c12"
+  },
+  "azureId": "acd9b024-47c2-489e-a0db-994c6fb1419c",
+  "profilePicture": "https://res.cloudinary.com/dibe6yrzf/image/upload/v1747668225/perfil-de-usuario_cxmmxq.png",
+  "name": "jfigueroa-2023015",
+  "email": "jfigueroa-2023015@kinal.edu.gt",
+  "role": "ADMIN_ROLE",
+  "subjects": [],
+  "rating": 5,
+  "createdAt": {
+    "$date": "2025-07-05T03:12:33.877Z"
+  },
+  "updatedAt": {
+    "$date": "2025-07-05T03:12:33.877Z"
+  },
+  "__v": 0
+}]

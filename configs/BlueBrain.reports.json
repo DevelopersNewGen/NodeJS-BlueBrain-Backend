@@ -1,0 +1,24 @@
+[{
+  "_id": {
+    "$oid": "68699bceaf30d3df6ea38d15"
+  },
+  "reportBy": {
+    "$oid": "68689821a7daf00b24499c12"
+  },
+  "reportTo": {
+    "$oid": "68689670c9a7e1a8b1eba8f4"
+  },
+  "reason": "mala actitud",
+  "relatedSubject": {
+    "$oid": "68695604f841fa6cd28e3987"
+  },
+  "details": "insulto durante la tutoria",
+  "status": "RESOLVED",
+  "createdAt": {
+    "$date": "2025-07-05T21:40:30.063Z"
+  },
+  "updatedAt": {
+    "$date": "2025-07-06T02:47:03.523Z"
+  },
+  "__v": 0
+}]

@@ -81,8 +81,6 @@ export const authCallback = async (req, res) => {
 
         const webToken = await generateJWT(dbUser._id);
 
-        console.log('Generated web token:', webToken);  
-        console.log(dbUser);
         const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
         const redirectUrl = `${frontendUrl}/auth/callback?token=${webToken}&user=${encodeURIComponent(JSON.stringify({
             email: dbUser.email,

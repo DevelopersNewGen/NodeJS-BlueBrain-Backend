@@ -3,7 +3,9 @@ import Subject from './subject.model.js';
 
 export const getSubjects = async (req, res) => {
     try {
-        const subjects = await Subject.find().populate('teachers', 'name email profilePicture');
+        const subjects = await Subject.find()
+            .populate('teachers', 'name email profilePicture')
+            .populate('tutors', 'name email profilePicture')
         return res.status(200).json({ 
             success: true, 
             message: 'Subjects retrieved successfully', 
@@ -21,7 +23,9 @@ export const getSubjects = async (req, res) => {
 export const getSubjectById = async (req, res) => {
     const { sid } = req.params;
     try {
-        const subject = await Subject.findById(sid).populate('teachers', 'name email profilePicture');
+        const subject = await Subject.findById(sid)
+            .populate('teachers', 'name email profilePicture')
+            .populate('tutors', 'name email profilePicture');
         if (!subject) {
             return res.status(404).json({ 
                 success: false, 
@@ -69,7 +73,7 @@ export const updateSubject = async (req, res) => {
     const { sid } = req.params;
     const { name, code, grade, description } = req.body;
     try {
-        const updatedSubject = await Subject.findByIdAndUpdate(sid, { name, code, grade, description }, { new: true });
+        const updatedSubject = await Subject.findByIdAndUpdate(sid, { name: name, code: code, grade: grade, description: description }, { new: true });
         if (!updatedSubject) {
             return res.status(404).json({ 
                 success: false, 

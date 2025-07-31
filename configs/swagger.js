@@ -58,11 +58,7 @@ const swaggerDocs = swaggerJSDoc(options);
 const swaggerOptions = {
     explorer: true,
     customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: "Blue Brain API Documentation",
-    swaggerOptions: {
-        persistAuthorization: true,
-        displayRequestDuration: true
-    }
+    customSiteTitle: "Blue Brain API Documentation"
 };
 
 export { swaggerDocs, swaggerUi, swaggerOptions };

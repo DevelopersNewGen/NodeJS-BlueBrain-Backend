@@ -28,6 +28,8 @@ const middlewares = (app) => {
 };
 
 const routes = (app) => {
+  app.use('/BlueBrain/v1/api-docs', express.static('node_modules/swagger-ui-dist'));
+  
   app.use("/BlueBrain/v1/auth", authRoutes);
   app.use("/BlueBrain/v1/subjects", subjectRoutes);
   app.use("/BlueBrain/v1/users", userRoutes);

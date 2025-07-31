@@ -19,8 +19,6 @@ import publicTutoRoutes from "../src/publicTutorial/publicTutorial.routes.js"
 import tutorialRoutes from "../src/tutorial/tutorial.routes.js";
 
 const middlewares = (app) => {
-  app.set('trust proxy', 1);
-  
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
   app.use(cors());

@@ -160,8 +160,6 @@ export const updateApplicationStatus = async (req, res) => {
 		}
     const app = await application.findById(aid).populate('subject', 'teachers');
 
-    console.log('Application found:', app);
-
     if(!app.subject.teachers.includes(usuario._id)) {
       return res.status(403).json({
         success: false,

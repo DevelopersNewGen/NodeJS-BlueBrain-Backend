@@ -1,5 +1,6 @@
 import privTutorial from "./privTutorial.model.js";
 import axios from "axios";
+import User from "../user/user.model.js";
 
 export const getPrivTutorials = async (req, res) => {
     try {
@@ -157,39 +158,31 @@ export const acceptPrivTutorial = async (req, res) => {
                     startDateTime,
                     endDateTime
                 );
-                console.log('Teams meeting created successfully:', meetingLink);
             } catch (error) {
                 console.error('Error creating Teams meeting:', error.response?.data || error.message);
                 
                 if (error.response?.status === 401 && usuario.refreshToken) {
-                    console.log('Token expired, attempting to refresh...');
                     try {
                         const newToken = await refreshUserToken(usuario.refreshToken);
                         
-                        const User = await import('../user/user.model.js').then(m => m.default);
                         await User.findByIdAndUpdate(usuario._id, { 
                             graphToken: newToken 
                         });
-                        
-                        console.log('Token refreshed successfully, retrying Teams meeting creation...');
-                        
+                                                
                         meetingLink = await createTeamsMeeting(
                             newToken,
                             `${tutorial.topic} - ${tutorial.subject.name}`,
                             startDateTime,
                             endDateTime
                         );
-                        console.log('Teams meeting created with new token:', meetingLink);
                     } catch (refreshError) {
                         console.error('Error refreshing token:', refreshError.response?.data || refreshError.message);
-                        console.log('Continuing without Teams meeting...');
                     }
                 } else {
-                    console.log('No refresh token available or different error, continuing without Teams meeting...');
                 }
             }
         } else {
-            console.log('No graph token available for user');
+            console.error('No graph token available for user');
         }
 
         tutorial.status = "ACCEPTED";
@@ -280,15 +273,9 @@ export const getMyPrivTutorials = async (req, res) => {
 
     try {
         const tutorials = await privTutorial.find({ student: usuario._id })
-            .populate('tutor subject')
+            .populate('tutor', 'name email profilePicture')
+            .populate('subject', 'name code img')
             .sort({ createdAt: -1 });
-
-        if (!tutorials || tutorials.length === 0) {
-            return res.status(404).json({
-                success: false,
-                message: 'No private tutorials found for this user'
-            });
-        }
 
         return res.status(200).json({
             success: true,
@@ -303,3 +290,4 @@ export const getMyPrivTutorials = async (req, res) => {
         });
     }
 }
+

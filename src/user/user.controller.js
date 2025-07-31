@@ -88,7 +88,6 @@ export const updateProfilePicture = async (req, res) => {
             profilePicture = 'https://res.cloudinary.com/dibe6yrzf/image/upload/v1747668225/perfil-de-usuario_cxmmxq.png';
         }
 
-        console.log('Profile picture:', profilePicture);
         const user = await User.findByIdAndUpdate(usuario._id, { profilePicture }, { new: true });
 
         if (!user) {

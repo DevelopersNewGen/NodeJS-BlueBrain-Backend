@@ -150,12 +150,6 @@ export const getMyPublicTutorials = async (req, res) => {
             .populate('tutor subject')
             .sort({ createdAt: -1 });
 
-        if (!tutorials || tutorials.length === 0) {
-            return res.status(404).json({
-                success: false,
-                message: 'No public tutorials found for this user'
-            });
-        }
 
         return res.status(200).json({
             success: true,

@@ -2,6 +2,7 @@ import Tutorial from "./tutorial.model.js";
 import User from "../user/user.model.js";
 import privTutorial from "../privTutorial/privTutorial.model.js";
 import publicTutorial from "../publicTutorial/publicTutorial.model.js";
+import Subject from "../subject/subject.model.js";
 import { createTeamsMeeting } from "../publicTutorial/publicTutorial.controller.js";
 import { DateTime } from 'luxon';
 
@@ -12,7 +13,7 @@ export const getTutorials = async (req, res) => {
             { $set: { status: "EXPIRED" } }
         );
 
-        const tutorials = await Tutorial.find().populate('host', 'name email profilePicture');
+        const tutorials = await Tutorial.find().populate('host', 'name email profilePicture').populate("subject", "name code img");
         return res.status(200).json({
             success: true,
             message: 'Tutorials retrieved successfully',
@@ -30,7 +31,7 @@ export const getTutorials = async (req, res) => {
 export const getTutorialById = async (req, res) => {
     const { tid } = req.params;
     try {
-        const tutorial = await Tutorial.findById(tid).populate('host', 'name email profilePicture');
+        const tutorial = await Tutorial.findById(tid).populate('host', 'name email profilePicture').populate("subject", "name code img");
         if (!tutorial) {
             return res.status(404).json({
                 success: false,
@@ -57,11 +58,15 @@ export const createTutorial = async (req, res) => {
         const { usuario } = req;
 
         const user = await User.findById(usuario._id);
+        const subjectRelated = await Subject.findById(subject);
 
-        if (user.subjects.includes(subject) === false) {
+        const isTeacher = subjectRelated.teachers.includes(usuario._id);
+        const isTutor = subjectRelated.tutors.includes(usuario._id);
+
+        if (!isTeacher && !isTutor) {
             return res.status(400).json({
                 success: false,
-                message: 'User is not enrolled in this subject'
+                message: 'User is not a teacher or tutor of this subject'
             });
         }
 
@@ -77,6 +82,63 @@ export const createTutorial = async (req, res) => {
 
         await newTutorial.save();
 
+        if (access === 'PUBLIC') {
+            let meetingLink = null;
+            let currentToken = user.graphToken;
+            
+            if (currentToken) {
+                try {
+                    const localStart = DateTime.fromJSDate(new Date(startTime), {
+                        zone: 'America/Guatemala'
+                    });
+                    const localEnd = DateTime.fromJSDate(new Date(endTime), {
+                        zone: 'America/Guatemala'
+                    });
+
+                    meetingLink = await createTeamsMeeting(
+                        currentToken,
+                        `${topic} - ${subject}`,
+                        localStart.toUTC().toISO(),
+                        localEnd.toUTC().toISO()
+                    );
+                } catch (error) {
+                    console.error('Error creating Teams meeting:', error.response?.data || error.message);
+                    
+                    if (error.response?.status === 401 && user.refreshToken) {
+                        try {
+                            const newToken = await refreshUserToken(user.refreshToken);
+                            
+                            await User.findByIdAndUpdate(usuario._id, { 
+                                graphToken: newToken 
+                            });
+                                                        
+                            meetingLink = await createTeamsMeeting(
+                                newToken,
+                                `${topic} - ${subject}`,
+                                localStart.toUTC().toISO(),
+                                localEnd.toUTC().toISO()
+                            );
+                        } catch (refreshError) {
+                            console.error('Error refreshing token:', refreshError.response?.data || refreshError.message);
+                        }
+                    }
+                }
+            }
+
+            const newPublicTutorial = new publicTutorial({
+                tutor: usuario._id,
+                students: [], 
+                subject,
+                topic,
+                description,
+                scheduledDate: startTime,
+                scheduledEndTime: endTime,
+                relatedTutorial: newTutorial._id,
+                meetingLink: meetingLink
+            });
+            
+            await newPublicTutorial.save();
+        }
 
         return res.status(201).json({
             success: true,
@@ -93,20 +155,35 @@ export const createTutorial = async (req, res) => {
     }
 }
 
+const refreshUserToken = async (refreshToken) => {
+    try {
+        const response = await fetch(`https://login.microsoftonline.com/${process.env.AZURE_TENANT_ID}/oauth2/v2.0/token`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                client_id: process.env.AZURE_CLIENT_ID,
+                client_secret: process.env.AZURE_CLIENT_SECRET,
+                refresh_token: refreshToken,
+                grant_type: 'refresh_token',
+                scope: 'openid profile email User.Read Files.ReadWrite OnlineMeetings.ReadWrite offline_access'
+            })
+        });
+
+        const data = await response.json();
+        return data.access_token;
+    } catch (error) {
+        console.error('Error refreshing token:', error);
+        throw error;
+    }
+};
+
 export const requestTutorial = async (req, res) => {
     const { tid } = req.params;
     const { usuario } = req;
 
     try {
-        const { startTime, endTime } = req.body;
-
-        const localStart = DateTime.fromJSDate(new Date(startTime), {
-            zone: 'America/Guatemala'
-        });
-        const localEnd = DateTime.fromJSDate(new Date(endTime), {
-            zone: 'America/Guatemala'
-        });
-
         const tutorial = await Tutorial.findById(tid);
 
         if (!tutorial) {
@@ -131,6 +208,15 @@ export const requestTutorial = async (req, res) => {
         }
 
         if (tutorial.access === 'PRIVATE') {
+            const { startTime, endTime } = req.body;
+
+            const localStart = DateTime.fromJSDate(new Date(startTime), {
+                zone: 'America/Guatemala'
+            });
+            const localEnd = DateTime.fromJSDate(new Date(endTime), {
+                zone: 'America/Guatemala'
+            });
+
             const newPrivTutorial = new privTutorial({
                 tutor: tutorial.host,
                 student: usuario._id,
@@ -146,40 +232,24 @@ export const requestTutorial = async (req, res) => {
         }
 
         if (tutorial.access === 'PUBLIC') {
-            let meetingLink = '';
-            const tutor = await User.findById(tutorial.host);
-            const graphToken = tutor?.graphToken;
-
-            if (graphToken) {
-                try {
-                    meetingLink = await createTeamsMeeting(
-                        graphToken,
-                        `${tutor.name} - ${tutorial.topic} - ${tutorial.subject?.name || 'No Subject'}`,
-                        localStart.toUTC().toISO(),
-                        localEnd.toUTC().toISO()
-                    );
-                } catch (error) {
-                    console.error('Error creating Teams meeting:', error);
-                    return res.status(500).json({
-                        success: false,
-                        message: 'Error creating Teams meeting'
-                    });
-                }
+            const existingPublicTutorial = await publicTutorial.findOne({ relatedTutorial: tid });
+            
+            if (!existingPublicTutorial) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Public tutorial not found'
+                });
             }
 
-            const newPublicTutorial = new publicTutorial({
-                tutor: tutorial.host,
-                student: usuario._id,
-                subject: tutorial.subject,
-                topic: tutorial.topic,
-                description: tutorial.description,
-                scheduledDate: localStart.toJSDate(),
-                scheduledEndTime: localEnd.toJSDate(),
-                status: 'PENDING',
-                relatedTutorial: tid,
-                meetingLink
-            });
-            await newPublicTutorial.save();
+            if (existingPublicTutorial.students.includes(usuario._id)) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'You are already registered for this tutorial'
+                });
+            }
+
+            existingPublicTutorial.students.push(usuario._id);
+            await existingPublicTutorial.save();
         }
 
         return res.status(201).json({
@@ -304,3 +374,46 @@ export const getTutorialsBySubject = async (req, res) => {
     }
 }
 
+export const getMyTutorialsTutor = async (req, res) => {
+    const { usuario } = req;
+
+    try {
+        const privTutorials = await privTutorial.find({ tutor: usuario._id })
+            .populate('tutor', 'name email profilePicture')
+            .populate('subject', 'name code img')
+            .sort({ scheduledDate: -1 });
+
+        const publicTutorials = await publicTutorial.find({ tutor: usuario._id })
+            .populate('tutor', 'name email profilePicture')
+            .populate('subject', 'name code img')
+            .sort({ scheduledDate: -1 });
+
+        const allTutorials = [...privTutorials, ...publicTutorials];
+
+        if (allTutorials.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'No tutorials found for this tutor'
+            });
+        }
+
+        allTutorials.sort((a, b) => new Date(b.scheduledDate) - new Date(a.scheduledDate));
+
+        return res.status(200).json({
+            success: true,
+            message: 'Tutorials retrieved successfully',
+            data: {
+                total: allTutorials.length,
+                private: privTutorials.length,
+                public: publicTutorials.length,
+                tutorials: allTutorials
+            }
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Error retrieving tutorials for tutor'
+        });
+    }
+}

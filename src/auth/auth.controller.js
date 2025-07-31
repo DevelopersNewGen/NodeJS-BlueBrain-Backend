@@ -37,12 +37,6 @@ export const authCallback = async (req, res) => {
         const accessToken = tokenResponse.data.access_token;
         const refreshToken = tokenResponse.data.refresh_token;
 
-        console.log('Token response data:', {
-            access_token: accessToken ? 'Present' : 'Missing',
-            refresh_token: refreshToken ? 'Present' : 'Missing',
-            expires_in: tokenResponse.data.expires_in
-        });
-
         const userResponse = await axios.get('https://graph.microsoft.com/v1.0/me', {
             headers: {
                 Authorization: `Bearer ${accessToken}`
@@ -71,13 +65,6 @@ export const authCallback = async (req, res) => {
         }
         
         await dbUser.save();
-
-        console.log('User saved with tokens:', {
-            userId: dbUser._id,
-            hasGraphToken: !!dbUser.graphToken,
-            hasRefreshToken: !!dbUser.refreshToken,
-            tokenExpiry: dbUser.tokenExpiry
-        });
 
         const webToken = await generateJWT(dbUser._id);
 

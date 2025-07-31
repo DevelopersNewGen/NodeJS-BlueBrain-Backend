@@ -4,6 +4,8 @@ import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
 import cors from "cors";
+import swaggerUi from "swagger-ui-express";
+import {swaggerDocs} from "./swagger.js";
 import apiLimiter from "../src/middlewares/rate-limit-validator.js";
 import authRoutes from "../src/auth/auth.routes.js";
 import subjectRoutes from "../src/subject/subject.routes.js";
@@ -33,8 +35,9 @@ const routes = (app) => {
   app.use("/BlueBrain/v1/applications", applicationRoutes);
   app.use("/BlueBrain/v1/materials", materialRoutes);
   app.use("/BlueBrain/v1/privTutorials", privTutoRoutes);
-  app.use("/BlueBrain/v1/tutorials", tutorialRoutes); 
-  app.use("/BlueBrain/v1/publicTutorials", publicTutoRoutes)
+  app.use("/BlueBrain/v1/tutorials", tutorialRoutes);
+  app.use("/BlueBrain/v1/publicTutorials", publicTutoRoutes);
+  app.use("/BlueBrain/v1/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 };
 
 const conectarDB = async () => {

@@ -65,7 +65,7 @@ export const validateGetTutorialsBySubject = [
 
 export const validateAcceptTutorial = [
     validateJWT,
-    hasRoles("TUTOR_ROLE"),
+    hasRoles("TUTOR_ROLE", "TEACHER_ROLE"),
     param('ptid').isMongoId().withMessage('Invalid tutorial id'),
     validateField,
     handleErrors
@@ -79,7 +79,7 @@ export const validateGetPrivTutorials = [
 export const validateGetPrivTutorialById = [
     validateJWT,
     hasRoles("TUTOR_ROLE", "TEACHER_ROLE", "ADMIN_ROLE", "STUDENT_ROLE"),
-    param('ptid').isMongoId().withMessage('Invalid private tutorial id'),
+    param('ptid').isMongoId().withMessage('Invalid tutorial id'),
     validateField,
     handleErrors
 ];
@@ -167,5 +167,11 @@ export const validateGetTutorialByStudent = [
 export const validateGetMyPrivTutorials = [
     validateJWT,
     hasRoles("STUDENT_ROLE", "TUTOR_ROLE", "TEACHER_ROLE"),
+    handleErrors
+];
+
+export const validateGetMyTutorialsTutor = [
+    validateJWT,
+    hasRoles("TUTOR_ROLE", "TEACHER_ROLE"),
     handleErrors
 ];

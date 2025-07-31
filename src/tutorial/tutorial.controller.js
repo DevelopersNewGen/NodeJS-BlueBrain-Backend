@@ -378,14 +378,32 @@ export const getMyTutorialsTutor = async (req, res) => {
     const { usuario } = req;
 
     try {
+        await privTutorial.updateMany(
+            { 
+                scheduledEndTime: { $lt: new Date() }, 
+                status: { $in: ["PENDING", "ACCEPTED"] }
+            },
+            { $set: { status: "COMPLETED" } }
+        );
+
+        await publicTutorial.updateMany(
+            { 
+                scheduledEndTime: { $lt: new Date() }, 
+                status: { $in: [ "PENDING"] }
+            },
+            { $set: { status: "COMPLETED" } }
+        );
+
         const privTutorials = await privTutorial.find({ tutor: usuario._id })
             .populate('tutor', 'name email profilePicture')
             .populate('subject', 'name code img')
+            .populate('student', 'name email profilePicture')
             .sort({ scheduledDate: -1 });
 
         const publicTutorials = await publicTutorial.find({ tutor: usuario._id })
             .populate('tutor', 'name email profilePicture')
             .populate('subject', 'name code img')
+            .populate('students', 'name email profilePicture')
             .sort({ scheduledDate: -1 });
 
         const allTutorials = [...privTutorials, ...publicTutorials];
